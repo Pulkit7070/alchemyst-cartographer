@@ -91,6 +91,7 @@ module "observability" {
   source                   = "./modules/observability"
   project_id               = var.project_id
   alert_notification_email = var.alert_notification_email
+  gateway_public_ip        = module.compute.gateway_public_ip
 
   depends_on = [module.compute]
 }

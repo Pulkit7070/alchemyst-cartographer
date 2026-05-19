@@ -45,6 +45,7 @@ load:
 	  --env API_URL="$(shell terraform -chdir=terraform output -raw api_url)"
 
 destroy:
+	@[ "$(CONFIRM)" = "yes" ] || { echo "ERROR: pass CONFIRM=yes to confirm destructive destroy"; exit 1; }
 	terraform -chdir=terraform destroy \
 	  -var="project_id=$(PROJECT_ID)" \
 	  -auto-approve

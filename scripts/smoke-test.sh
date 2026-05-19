@@ -36,11 +36,15 @@ RESPONSE=$(curl -fsS \
 echo "Response:"
 echo "${RESPONSE}" | jq .
 
-# Validate response structure
-echo "${RESPONSE}" | jq -e '.choices[0].message.content' > /dev/null || {
-  echo "FAIL: response missing choices[0].message.content"
-  exit 1
-}
+# Validate OpenAI-compatible response schema
+FAIL=0
+for field in '.id' '.object' '.model' '.choices' '.choices[0].message.role' '.choices[0].message.content' '.choices[0].finish_reason'; do
+  val=$(echo "${RESPONSE}" | jq -e "${field}" 2>/dev/null) || { echo "FAIL: missing field ${field}"; FAIL=1; }
+done
+[[ "${FAIL}" -eq 1 ]] && exit 1
+
+OBJECT=$(echo "${RESPONSE}"  | jq -r '.object')
+[[ "${OBJECT}" == "chat.completion" ]] || { echo "FAIL: .object should be 'chat.completion', got '${OBJECT}'"; exit 1; }
 
 CONTENT=$(echo "${RESPONSE}" | jq -r '.choices[0].message.content')
 echo ""

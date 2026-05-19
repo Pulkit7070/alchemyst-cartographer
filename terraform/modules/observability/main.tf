@@ -33,7 +33,7 @@ resource "google_monitoring_uptime_check_config" "api" {
     type = "uptime_url"
     labels = {
       project_id = var.project_id
-      host       = "placeholder"
+      host       = var.gateway_public_ip != "" ? var.gateway_public_ip : "0.0.0.0"
     }
   }
 }

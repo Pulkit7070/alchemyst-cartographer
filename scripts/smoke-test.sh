@@ -13,7 +13,7 @@ fi
 echo "==> Smoke test against: ${API_URL}"
 echo "==> Waiting for API to be ready..."
 
-# Retry up to 30 times with 10s gap (5 min total — VMs take time to boot)
+# Retry up to 30 times with 10s gap (5 min total - VMs take time to boot)
 for i in $(seq 1 30); do
   STATUS=$(curl -so /dev/null -w "%{http_code}" \
     --connect-timeout 5 \
@@ -21,7 +21,7 @@ for i in $(seq 1 30); do
   if [[ "${STATUS}" == "200" ]]; then
     break
   fi
-  echo "  attempt ${i}/30 — got ${STATUS}, retrying in 10s..."
+  echo "  attempt ${i}/30 - got ${STATUS}, retrying in 10s..."
   sleep 10
 done
 

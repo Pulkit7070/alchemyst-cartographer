@@ -19,7 +19,7 @@
 - [x] Inference VM has no external IP (verified by `scripts/verify-isolation.sh`)
 - [x] Deny-all default firewall (no `default-allow-*` rules)
 - [x] iii engine port 49134 only reachable from private subnet CIDR
-- [x] SSH only via IAP (source `35.235.240.0/20`) — not from open internet
+- [x] SSH only via IAP (source `35.235.240.0/20`) - not from open internet
 - [x] Cloud NAT for private subnet egress (no public IP needed for `pip install`)
 - [x] VPC Flow Logs enabled on both subnets (5s aggregation, 50% sampling)
 - [ ] VPC Service Controls (todo: production hardening for data exfil prevention)
@@ -35,7 +35,7 @@
 - [x] systemd hardening: `NoNewPrivileges`, `ProtectSystem=strict`, `PrivateTmp`, `ProtectHome`
 - [x] Services run as unprivileged `alchemyst` user (not root)
 - [x] `TimeoutStartSec=300` prevents zombie services if model load hangs
-- [ ] API authentication (no auth currently — acceptable for assignment; production: API key via Secret Manager header check in caller-worker)
+- [ ] API authentication (no auth currently - acceptable for assignment; production: API key via Secret Manager header check in caller-worker)
 - [ ] TLS termination (documented in scaling path; requires a domain)
 
 ### IAM
@@ -44,7 +44,7 @@
 - [ ] Workload Identity Federation for CI/CD (replaces service account key files)
 
 ### Audit & Observability
-- [x] Cloud Audit Logs (Admin Activity + Data Access) — enabled by default on GCP
+- [x] Cloud Audit Logs (Admin Activity + Data Access) - enabled by default on GCP
 - [x] VPC Flow Logs → Cloud Logging
 - [x] Cloud Monitoring alerts: API down, CPU spike
 

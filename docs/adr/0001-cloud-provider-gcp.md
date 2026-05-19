@@ -1,4 +1,4 @@
-# ADR 0001: Cloud Provider — GCP
+# ADR 0001: Cloud Provider - GCP
 
 **Status:** Accepted
 
@@ -11,7 +11,7 @@ Use GCP.
 ## Consequences
 **Positive:**
 - Production GCP experience at ArmorIQ means no ramp-up time
-- GCP's IAP TCP forwarding eliminates the need for a bastion host entirely — SSH is IAM-gated with no public port 22
+- GCP's IAP TCP forwarding eliminates the need for a bastion host entirely - SSH is IAM-gated with no public port 22
 - Cloud NAT is simpler to configure than AWS NAT Gateway for single-region deployments
 - $300 free credit covers the full assignment
 

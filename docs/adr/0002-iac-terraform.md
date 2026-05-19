@@ -1,4 +1,4 @@
-# ADR 0002: IaC Tool — Terraform
+# ADR 0002: IaC Tool - Terraform
 
 **Status:** Accepted
 

@@ -1,4 +1,4 @@
-# ADR 0006: Process Management — systemd (Not Docker/k8s)
+# ADR 0006: Process Management - systemd (Not Docker/k8s)
 
 **Status:** Accepted
 
@@ -12,11 +12,11 @@ Use systemd units directly on the VMs.
 
 ## Consequences
 **Positive:**
-- Zero runtime overhead — no container daemon, no orchestration layer
+- Zero runtime overhead - no container daemon, no orchestration layer
 - systemd is always present on Ubuntu 22.04 LTS; no extra installs
 - `Restart=always` + `RestartSec` provides automatic recovery equivalent to Docker's `restart: always`
 - `After=` + `Requires=` models the service dependency (caller-worker waits for engine)
-- Hardening options (`NoNewPrivileges`, `ProtectSystem`, `PrivateTmp`) are native systemd features — equivalent to Docker's `--security-opt` but simpler to configure
+- Hardening options (`NoNewPrivileges`, `ProtectSystem`, `PrivateTmp`) are native systemd features - equivalent to Docker's `--security-opt` but simpler to configure
 - Logs go to journald → Cloud Logging without extra configuration
 
 **Negative:**

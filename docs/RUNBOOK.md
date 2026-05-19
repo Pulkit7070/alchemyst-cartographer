@@ -4,7 +4,7 @@ Operational procedures for the Alchemyst Cloud Cartographer deployment.
 
 ---
 
-## SSH Access (IAP only — no public port 22)
+## SSH Access (IAP only - no public port 22)
 
 ```bash
 # Gateway VM
@@ -13,7 +13,7 @@ gcloud compute ssh gateway-vm \
   --zone=asia-south1-a \
   --project=<PROJECT_ID>
 
-# Inference VM (private — no public IP; IAP tunnels through Google's network)
+# Inference VM (private - no public IP; IAP tunnels through Google's network)
 gcloud compute ssh inference-vm \
   --tunnel-through-iap \
   --zone=asia-south1-a \
@@ -25,13 +25,13 @@ gcloud compute ssh inference-vm \
 ## Tailing Logs
 
 ```bash
-# On gateway VM — iii engine
+# On gateway VM - iii engine
 sudo journalctl -fu iii-engine --output=cat
 
-# On gateway VM — caller worker (HTTP layer)
+# On gateway VM - caller worker (HTTP layer)
 sudo journalctl -fu caller-worker --output=cat
 
-# On inference VM — model worker
+# On inference VM - model worker
 sudo journalctl -fu inference-worker --output=cat
 
 # From your laptop via Cloud Logging

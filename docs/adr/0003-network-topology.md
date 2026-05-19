@@ -1,4 +1,4 @@
-# ADR 0003: Network Topology — Public + Private Subnets + Cloud NAT
+# ADR 0003: Network Topology - Public + Private Subnets + Cloud NAT
 
 **Status:** Accepted
 
@@ -19,6 +19,6 @@ Two-subnet topology:
 
 **Negative:**
 - Two subnets + router + NAT adds ~3 extra Terraform resources vs a single subnet
-- Cloud NAT charges ~$0.045/hr (~$32/mo) — acceptable for production; acceptable for a $300 credit demo
+- Cloud NAT charges ~$0.045/hr (~$32/mo) - acceptable for production; acceptable for a $300 credit demo
 
 **vs single subnet:** A single subnet with firewall rules technically works but proves no real understanding of network isolation. Private subnet with no external IP is the production-correct approach.

@@ -4,7 +4,7 @@ locals {
   ] : []
 }
 
-# ── Notification channel (email) ──────────────────────────────────────────────
+# Notification channel (email)
 resource "google_monitoring_notification_channel" "email" {
   count        = var.alert_notification_email != "" ? 1 : 0
   project      = var.project_id
@@ -15,7 +15,7 @@ resource "google_monitoring_notification_channel" "email" {
   }
 }
 
-# ── Uptime check on the API endpoint ─────────────────────────────────────────
+# Uptime check on the API endpoint
 resource "google_monitoring_uptime_check_config" "api" {
   project      = var.project_id
   display_name = "API /healthz"
@@ -38,7 +38,7 @@ resource "google_monitoring_uptime_check_config" "api" {
   }
 }
 
-# ── Alert: API uptime failure ─────────────────────────────────────────────────
+# Alert: API uptime failure
 resource "google_monitoring_alert_policy" "api_down" {
   project      = var.project_id
   display_name = "API Endpoint Down"
@@ -62,7 +62,7 @@ resource "google_monitoring_alert_policy" "api_down" {
   severity              = "CRITICAL"
 }
 
-# ── Alert: Gateway VM CPU > 80% for 5 min ─────────────────────────────────────
+# Alert: Gateway VM CPU > 80% for 5 min
 resource "google_monitoring_alert_policy" "gateway_cpu" {
   project      = var.project_id
   display_name = "Gateway VM High CPU"
@@ -86,7 +86,7 @@ resource "google_monitoring_alert_policy" "gateway_cpu" {
   severity              = "WARNING"
 }
 
-# ── Alert: Inference VM CPU > 90% for 10 min ─────────────────────────────────
+# Alert: Inference VM CPU > 90% for 10 min
 resource "google_monitoring_alert_policy" "inference_cpu" {
   project      = var.project_id
   display_name = "Inference VM High CPU"
@@ -110,7 +110,7 @@ resource "google_monitoring_alert_policy" "inference_cpu" {
   severity              = "WARNING"
 }
 
-# ── Dashboard (JSON as heredoc — terraform fmt does not touch heredoc contents)
+#  Dashboard (JSON as heredoc — terraform fmt does not touch heredoc contents)
 resource "google_monitoring_dashboard" "main" {
   project        = var.project_id
   dashboard_json = <<-EOT

@@ -38,7 +38,7 @@ HTTP_CODE=$(curl -so /dev/null -w "%{http_code}" --max-time 15 \
 
 echo "     API responded with HTTP ${HTTP_CODE} (expected 4xx/5xx, not a hang)"
 
-# 4. systemd auto-restarts the worker — wait and verify recovery
+# 4. systemd auto-restarts the worker - wait and verify recovery
 echo "[4/4] Waiting for auto-recovery (systemd Restart=always, RestartSec=5)..."
 sleep 15
 
@@ -51,7 +51,7 @@ for i in $(seq 1 12); do
     echo "     PASS: API recovered after ${i} poll(s) ✓"
     break
   fi
-  echo "     poll ${i}/12 — status ${STATUS}, waiting 10s..."
+  echo "     poll ${i}/12 - status ${STATUS}, waiting 10s..."
   sleep 10
 done
 

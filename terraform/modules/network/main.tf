@@ -5,7 +5,7 @@ resource "google_compute_network" "vpc" {
   routing_mode            = "REGIONAL"
 }
 
-# ── Public subnet (gateway VM lives here) ─────────────────────────────────────
+# Public subnet (gateway VM lives here)
 resource "google_compute_subnetwork" "public" {
   project                  = var.project_id
   name                     = "public-subnet"
@@ -21,7 +21,7 @@ resource "google_compute_subnetwork" "public" {
   }
 }
 
-# ── Private subnet (inference VM lives here — no public IP) ───────────────────
+# Private subnet (inference VM lives here — no public IP)
 resource "google_compute_subnetwork" "private" {
   project                  = var.project_id
   name                     = "private-subnet"
@@ -37,7 +37,7 @@ resource "google_compute_subnetwork" "private" {
   }
 }
 
-# ── Cloud Router + NAT (private subnet gets internet egress for pip install) ──
+# Cloud Router + NAT (private subnet gets internet egress for pip install)
 resource "google_compute_router" "router" {
   project = var.project_id
   name    = "alchemyst-router"
@@ -64,7 +64,7 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
-# ── Firewall rules (deny-by-default; only what's explicitly needed) ───────────
+# Firewall rules (deny-by-default; only what's explicitly needed)
 
 # SSH via IAP — gateway and inference VMs
 resource "google_compute_firewall" "allow_iap_ssh" {

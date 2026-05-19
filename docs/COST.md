@@ -13,7 +13,7 @@ Monthly cost for the assignment deployment in `asia-south1` (Mumbai).
 | Cloud NAT | ~10 GB egress (model download + traffic) | $0.045/GB | ~$5 |
 | GCS buckets | state + bundles, ~500 MB | $0.020/GB/mo | ~$1 |
 | VPC Flow Logs | 50% sampling, ~2 GB/mo | $0.50/GB | ~$1 |
-| Cloud Monitoring | within free tier | — | $0 |
+| Cloud Monitoring | within free tier | - | $0 |
 | **Total** | | | **~$158/mo** |
 
 ## Free Trial Coverage

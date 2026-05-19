@@ -1,5 +1,5 @@
 [Unit]
-Description=iii Inference Worker (Python — Gemma 3 270M)
+Description=iii Inference Worker (Python - Gemma 3 270M)
 After=network-online.target
 Wants=network-online.target
 

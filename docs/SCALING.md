@@ -1,6 +1,6 @@
 # Scaling to 100x
 
-This document covers what changes — and what stays the same — when scaling
+This document covers what changes - and what stays the same - when scaling
 the current single-VM deployment to production-grade distributed inference.
 
 ---
@@ -19,11 +19,11 @@ Each axis requires a different set of changes. Below we walk through all three.
 
 ---
 
-## Axis 1 — 100x Bigger Model
+## Axis 1 - 100x Bigger Model
 
 ### The compute problem
 Gemma 3 270M Q8 sits in 241 MB of RAM and runs acceptably on CPUs.
-A 27B parameter model in Q4 quantization needs ~14 GB of VRAM — beyond any CPU.
+A 27B parameter model in Q4 quantization needs ~14 GB of VRAM - beyond any CPU.
 
 | Model | Quant | VRAM needed | Target GPU |
 |-------|-------|-------------|------------|
@@ -51,7 +51,7 @@ A 27B parameter model in Q4 quantization needs ~14 GB of VRAM — beyond any CPU
 
 ---
 
-## Axis 2 — 100x Throughput
+## Axis 2 - 100x Throughput
 
 ### Continuous batching (the biggest win)
 The current `transformers.pipeline()` processes one request at a time.
@@ -82,7 +82,7 @@ When sustained load exceeds ~100 req/s or you need multi-model routing:
 
 1. **GKE Autopilot** with NVIDIA GPU node pools (T4/L4 nodes auto-provisioned).
 2. **NVIDIA Triton Inference Server** as the serving frontend: wraps vLLM or TensorRT-LLM backends, exposes gRPC + HTTP, dynamic batching, multi-model, Prometheus metrics.
-3. **NVIDIA Dynamo** (2025+) for disaggregated prefill/decode: routes compute-heavy prefill to dedicated nodes and memory-bound decode to separate decode nodes. Scales prefill and decode independently — critical when batch sizes are large.
+3. **NVIDIA Dynamo** (2025+) for disaggregated prefill/decode: routes compute-heavy prefill to dedicated nodes and memory-bound decode to separate decode nodes. Scales prefill and decode independently - critical when batch sizes are large.
 
 ### What stays the same
 The iii framework's worker abstraction is the correct architectural decision here.
@@ -93,7 +93,7 @@ Terraform modules stay unchanged. This is the value of the worker-per-concern de
 
 ---
 
-## Axis 3 — Latency at Scale
+## Axis 3 - Latency at Scale
 
 ### Key metrics to track (not just request latency)
 - **TTFT (Time To First Token)**: latency until the user sees the first word. Dominates perceived responsiveness.
@@ -103,11 +103,11 @@ Terraform modules stay unchanged. This is the value of the worker-per-concern de
 ### Techniques
 | Technique | Win | Complexity |
 |-----------|-----|-----------|
-| Continuous batching (vLLM default) | 10–30× throughput | Low — automatic |
-| Speculative decoding | ~2× TTFT reduction | Medium — need a draft model |
+| Continuous batching (vLLM default) | 10–30× throughput | Low - automatic |
+| Speculative decoding | ~2× TTFT reduction | Medium - need a draft model |
 | KV cache offload (CPU/disk) | Enables longer context | Medium |
-| Flash Attention 2 | ~2× attention speed | Low — pip install |
-| Multi-GPU tensor parallelism | Linear throughput scaling | High — need NVLink |
+| Flash Attention 2 | ~2× attention speed | Low - pip install |
+| Multi-GPU tensor parallelism | Linear throughput scaling | High - need NVLink |
 
 ### Speculative decoding in practice
 Use a small draft model (e.g. Gemma 3 1B) to predict the next N tokens,

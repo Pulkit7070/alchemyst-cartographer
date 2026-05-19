@@ -22,7 +22,7 @@ locals {
   SH
 }
 
-# ── Static internal IP for gateway (inference VM needs to know it at boot) ────
+# Static internal IP for gateway (inference VM needs to know it at boot)
 resource "google_compute_address" "gateway_internal" {
   project      = var.project_id
   name         = "gateway-internal-ip"
@@ -32,7 +32,7 @@ resource "google_compute_address" "gateway_internal" {
   address      = "10.10.1.10"
 }
 
-# ── Gateway VM ────────────────────────────────────────────────────────────────
+# Gateway VM
 resource "google_compute_instance" "gateway" {
   project      = var.project_id
   name         = "gateway-vm"
@@ -105,7 +105,7 @@ resource "google_compute_instance" "gateway" {
   allow_stopping_for_update = true
 }
 
-# ── Inference VM (no public IP) ───────────────────────────────────────────────
+# Inference VM (no public IP)
 resource "google_compute_instance" "inference" {
   project      = var.project_id
   name         = "inference-vm"

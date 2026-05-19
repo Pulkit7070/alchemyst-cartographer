@@ -1,4 +1,4 @@
-# ADR 0004: SSH Access — IAP TCP Forwarding (No Bastion, No Public Port 22)
+# ADR 0004: SSH Access - IAP TCP Forwarding (No Bastion, No Public Port 22)
 
 **Status:** Accepted
 
@@ -13,8 +13,8 @@ Use GCP IAP TCP forwarding. Firewall allows port 22 only from `35.235.240.0/20` 
 
 ## Consequences
 **Positive:**
-- No public port 22 exposure — eliminates brute-force SSH attack surface entirely
-- Works for inference VM (private subnet, no public IP) — IAP tunnels through Google's network
+- No public port 22 exposure - eliminates brute-force SSH attack surface entirely
+- Works for inference VM (private subnet, no public IP) - IAP tunnels through Google's network
 - SSH access is IAM-gated: only identities with `roles/iap.tunnelResourceAccessor` can connect
 - Every SSH session is Cloud Audit Logged automatically
 - Eliminates a bastion VM ($13/mo e2-micro + management overhead)

@@ -10,7 +10,7 @@ provider "google-beta" {
   zone    = var.zone
 }
 
-# ── Required GCP APIs ─────────────────────────────────────────────────────────
+# Required GCP APIs
 locals {
   required_apis = [
     "compute.googleapis.com",
@@ -31,7 +31,7 @@ resource "google_project_service" "apis" {
   disable_on_destroy = false
 }
 
-# ── App bundle bucket (VMs pull app from here on startup) ─────────────────────
+# App bundle bucket (VMs pull app from here on startup)
 resource "google_storage_bucket" "app_bundles" {
   project                     = var.project_id
   name                        = "${var.project_id}-app-bundles"
@@ -46,7 +46,7 @@ resource "google_storage_bucket" "app_bundles" {
   depends_on = [google_project_service.apis]
 }
 
-# ── Network ───────────────────────────────────────────────────────────────────
+# Network
 module "network" {
   source     = "./modules/network"
   project_id = var.project_id
@@ -55,7 +55,7 @@ module "network" {
   depends_on = [google_project_service.apis]
 }
 
-# ── IAM ───────────────────────────────────────────────────────────────────────
+# IAM
 module "iam" {
   source      = "./modules/iam"
   project_id  = var.project_id
@@ -64,7 +64,7 @@ module "iam" {
   depends_on = [google_project_service.apis]
 }
 
-# ── Compute ───────────────────────────────────────────────────────────────────
+# Compute
 module "compute" {
   source                   = "./modules/compute"
   project_id               = var.project_id
@@ -86,7 +86,7 @@ module "compute" {
   ]
 }
 
-# ── Observability ─────────────────────────────────────────────────────────────
+# Observability
 module "observability" {
   source                   = "./modules/observability"
   project_id               = var.project_id

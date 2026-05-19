@@ -5,15 +5,15 @@ ZONE       ?= asia-south1-a
 
 help:
 	@echo "Targets:"
-	@echo "  bootstrap  — create GCS state/bundle buckets (run once)"
-	@echo "  bundle     — package app and upload to GCS"
-	@echo "  deploy     — bundle + terraform apply"
-	@echo "  validate   — terraform fmt/validate/tflint/tfsec"
-	@echo "  smoke      — end-to-end API test"
-	@echo "  isolation  — verify inference VM is unreachable"
-	@echo "  chaos      — kill worker, verify auto-recovery"
-	@echo "  load       — k6 load test (requires k6 installed)"
-	@echo "  destroy    — terraform destroy"
+	@echo "  bootstrap  - create GCS state/bundle buckets (run once)"
+	@echo "  bundle     - package app and upload to GCS"
+	@echo "  deploy     - bundle + terraform apply"
+	@echo "  validate   - terraform fmt/validate/tflint/tfsec"
+	@echo "  smoke      - end-to-end API test"
+	@echo "  isolation  - verify inference VM is unreachable"
+	@echo "  chaos      - kill worker, verify auto-recovery"
+	@echo "  load       - k6 load test (requires k6 installed)"
+	@echo "  destroy    - terraform destroy"
 
 bootstrap:
 	bash scripts/bootstrap.sh $(PROJECT_ID)

@@ -1,78 +1,104 @@
 #!/usr/bin/env bash
-# Phase 0: Run the entire stack locally before touching any cloud infra.
-# Prerequisites: iii CLI, bun (or node 20), python3.11, pip
+# Run the full stack locally: iii engine + inference worker + caller worker.
+# Prerequisites:
+#   - iii CLI: curl -fsSL https://install.iii.dev/iii/main/install.sh | sh
+#     (on Windows Git Bash: TARGET=x86_64-pc-windows-msvc bash -c "$(curl ...)")
+#   - node 20+, python 3.11+
 # Usage: bash scripts/local-run.sh
 set -euo pipefail
 
-QUICKSTART_DIR="$(cd "$(dirname "$0")/../quickstart" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+QUICKSTART_DIR="${REPO_DIR}/quickstart"
+VENV_DIR="${REPO_DIR}/venv"
+HF_CACHE="${REPO_DIR}/.cache/huggingface"
+
+export PATH="${HOME}/.local/bin:${HOME}/bin:${PATH}"
 
 echo "==> Checking prerequisites..."
-command -v iii   >/dev/null || { echo "ERROR: iii CLI not found. Install: npm i -g @iii-org/cli"; exit 1; }
-command -v bun   >/dev/null || command -v node >/dev/null || { echo "ERROR: bun or node required"; exit 1; }
-command -v python3 >/dev/null || { echo "ERROR: python3 required"; exit 1; }
+command -v iii  >/dev/null || { echo "ERROR: iii not found."; echo "  Install: TARGET=x86_64-pc-windows-msvc bash -c \"\$(curl -fsSL https://install.iii.dev/iii/main/install.sh)\""; exit 1; }
+command -v node >/dev/null || { echo "ERROR: node 20+ required"; exit 1; }
+
+PYTHON="${VENV_DIR}/Scripts/python.exe"
+[[ -f "${PYTHON}" ]] || PYTHON="${VENV_DIR}/bin/python"
+if [[ ! -f "${PYTHON}" ]]; then
+  echo "==> Creating venv..."
+  python3 -m venv "${VENV_DIR}" 2>/dev/null || python -m venv "${VENV_DIR}"
+fi
 
 echo "==> Installing caller-worker deps..."
 cd "${QUICKSTART_DIR}/workers/caller-worker"
-npm install
+npm install --silent
 
 echo "==> Installing inference-worker deps..."
-cd "${QUICKSTART_DIR}/workers/inference-worker"
-pip install -r requirements.txt --quiet
+"${PYTHON}" -m pip install --quiet \
+  "iii-sdk==0.11.0" "gguf>=0.10.0" transformers accelerate torch watchfiles 2>/dev/null || true
 
-echo "==> Starting iii engine + workers..."
+echo "==> Starting iii engine (built-in HTTP on :3111, WS on :49134)..."
 cd "${QUICKSTART_DIR}"
 
-# Use local config (127.0.0.1 binding for local dev)
-sed -i.bak 's/host: 0.0.0.0/host: 127.0.0.1/' config.yaml || true
+cleanup() {
+  echo ""
+  echo "==> Stopping all services..."
+  kill "${ENGINE_PID:-}" "${INF_PID:-}" "${CALLER_PID:-}" 2>/dev/null || true
+}
+trap cleanup EXIT
 
-# Start engine in background
-iii engine start --config config.yaml &
+III_TELEMETRY_ENABLED=false iii --use-default-config --no-update-check \
+  > /tmp/iii-engine.log 2>&1 &
 ENGINE_PID=$!
-echo "    Engine PID: ${ENGINE_PID}"
-sleep 3
 
-# Start inference worker in background
-cd workers/inference-worker
-python3 inference_worker.py &
+for i in $(seq 1 10); do
+  STATUS=$(curl -so /dev/null -w "%{http_code}" http://127.0.0.1:3111/ 2>/dev/null || echo "000")
+  [[ "${STATUS}" != "000" ]] && echo "    Engine ready (poll ${i})" && break
+  [[ $i -eq 10 ]] && { echo "ERROR: engine did not start"; cat /tmp/iii-engine.log | tail -5; exit 1; }
+  sleep 2
+done
+
+echo "==> Starting inference worker (first run downloads ~241 MB)..."
+cd "${QUICKSTART_DIR}/workers/inference-worker"
+TRANSFORMERS_OFFLINE=0 PYTHONUNBUFFERED=1 \
+  III_URL="ws://127.0.0.1:49134" \
+  HF_HOME="${HF_CACHE}" \
+  MAX_NEW_TOKENS="${MAX_NEW_TOKENS:-32}" \
+  "${PYTHON}" -u inference_worker.py > /tmp/inference-worker.log 2>&1 &
 INF_PID=$!
-echo "    Inference worker PID: ${INF_PID}"
-sleep 2
 
-# Start caller worker in background
+echo "==> Starting caller worker..."
 cd "${QUICKSTART_DIR}/workers/caller-worker"
-npm run dev &
+III_URL="ws://127.0.0.1:49134" node --import tsx/esm src/worker.ts \
+  > /tmp/caller-worker.log 2>&1 &
 CALLER_PID=$!
-echo "    Caller worker PID: ${CALLER_PID}"
 
-# Restore cloud config after local run
-trap "kill ${ENGINE_PID} ${INF_PID} ${CALLER_PID} 2>/dev/null; \
-  sed -i 's/host: 127.0.0.1/host: 0.0.0.0/' ${QUICKSTART_DIR}/config.yaml || true; \
-  echo 'Stopped all workers'" EXIT
-
-echo ""
-echo "==> Waiting for model to load (~60s for first download)..."
-sleep 10
-
-echo "==> Running local smoke test..."
-for i in $(seq 1 20); do
-  STATUS=$(curl -so /dev/null -w "%{http_code}" \
-    http://127.0.0.1:3111/healthz 2>/dev/null || echo "000")
-  if [[ "${STATUS}" == "200" ]]; then
-    echo "    API ready after ${i} polls"
+echo "==> Waiting for model to load (~10-60s depending on cache)..."
+for i in $(seq 1 30); do
+  if grep -q "Inference worker started" /tmp/inference-worker.log 2>/dev/null; then
+    echo "    Model ready (poll ${i})"
     break
   fi
-  echo "    poll ${i}/20 — waiting..."
-  sleep 10
+  [[ $i -eq 30 ]] && { echo "ERROR: inference worker did not start"; cat /tmp/inference-worker.log | tail -10; exit 1; }
+  sleep 5
 done
 
 echo ""
+echo "==> Smoke test: GET /healthz"
+curl -fsS http://127.0.0.1:3111/healthz
+
+echo ""
+echo "==> Smoke test: POST /v1/chat/completions"
 RESPONSE=$(curl -fsS -X POST http://127.0.0.1:3111/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"messages":[{"role":"user","content":"What is 2+2? Answer with just the number."}]}')
+  -d '{"messages":[{"role":"user","content":"What is 2+2? Answer with just the number."}]}' \
+  --max-time 30)
 
-echo "Response:"
-echo "${RESPONSE}" | jq .
+echo "${RESPONSE}"
+CONTENT=$(echo "${RESPONSE}" | "${PYTHON}" -c \
+  "import sys,json; print(json.load(sys.stdin)['choices'][0]['message']['content'])" 2>/dev/null || echo "(parse error)")
+
 echo ""
+echo "==> Model replied: '${CONTENT}'"
 echo "==> LOCAL RUN PASSED ✓"
-echo "    Press Ctrl+C to stop all services."
+echo ""
+echo "    API endpoint: http://127.0.0.1:3111/v1/chat/completions"
+echo "    Press Ctrl+C to stop."
 wait

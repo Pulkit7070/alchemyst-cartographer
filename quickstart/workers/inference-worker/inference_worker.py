@@ -65,7 +65,8 @@ def run_inference_handler(payload: Dict[str, Any]) -> str:
     messages = payload.get("messages", [])
     text     = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs   = tokenizer(text, return_tensors="pt").to(model.device)
-    output   = model.generate(**inputs, max_new_tokens=32000)
+    max_new = int(os.environ.get("MAX_NEW_TOKENS", "256"))
+    output   = model.generate(**inputs, max_new_tokens=max_new)
     result   = tokenizer.decode(output[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
     logger.info(f"inference::run_inference completed, output length={len(result)}")
     return result

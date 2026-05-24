@@ -17,13 +17,18 @@ iii.registerFunction(
 // HTTP handler — receives POST /v1/chat/completions
 iii.registerFunction(
   "http::run_inference_over_http",
-  async (req: { body: string | Record<string, unknown> }) => {
-    const body =
-      typeof req.body === "string"
-        ? (JSON.parse(req.body) as Record<string, unknown>)
-        : req.body;
+  async (req: Record<string, unknown>) => {
+    // iii may pass the parsed JSON body directly as req, or nested under req.body
+    let parsed: Record<string, unknown>;
+    if (req?.body != null) {
+      parsed = typeof req.body === "string"
+        ? (JSON.parse(req.body as string) as Record<string, unknown>)
+        : (req.body as Record<string, unknown>);
+    } else {
+      parsed = req;
+    }
 
-    const messages = body.messages as Array<{ role: string; content: string }>;
+    const messages = parsed.messages as Array<{ role: string; content: string }>;
 
     const result = await iii.trigger({
       function_id: "inference::run_inference",

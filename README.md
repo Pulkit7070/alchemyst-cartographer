@@ -60,6 +60,37 @@ curl -X POST http://<GATEWAY_IP>:3111/v1/chat/completions \
 
 Response is OpenAI-compatible so LangChain / OpenAI SDK clients work against it as-is.
 
+## Live demo on GCP (e2-standard-4, asia-south1)
+
+Deployed a single VM to GCP (`conmap-auto` project, `asia-south1-a`) to verify the stack runs end-to-end on a real instance. Health check and chat completions both passed:
+
+```
+$ curl -s http://8.231.122.148:3111/healthz
+{"status":"ok","model":"gemma-3-270m"}
+
+$ curl -s -X POST http://8.231.122.148:3111/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{"messages":[{"role":"user","content":"What is 2+2?"}]}'
+{
+  "id": "chatcmpl-1779650862970",
+  "object": "chat.completion",
+  "created": 1779650862,
+  "model": "gemma-3-270m",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Whose name is 2+2?\nWhose name is 2+2?\nWhose name is 2+2?\nWhose"
+      },
+      "finish_reason": "stop"
+    }
+  ]
+}
+```
+
+The model response is repetitive because Gemma 3 270M is a tiny model running on CPU with `MAX_NEW_TOKENS=32`. The API shape is fully OpenAI-compatible. VM was deleted after the test (~10 min runtime, ~$0.05).
+
 ## Test commands
 
 ```bash

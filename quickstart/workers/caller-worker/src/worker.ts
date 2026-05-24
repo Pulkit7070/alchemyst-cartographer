@@ -3,7 +3,7 @@ import { registerWorker } from "iii-sdk";
 const engineUrl = process.env.III_URL ?? "ws://localhost:49134";
 const iii = registerWorker(engineUrl);
 
-// RPC bridge — callable by other workers
+// RPC bridge - callable by other workers
 iii.registerFunction(
   "inference::get_response",
   async (payload: { messages: Array<{ role: string; content: string }> }) => {
@@ -14,7 +14,7 @@ iii.registerFunction(
   }
 );
 
-// HTTP handler — receives POST /v1/chat/completions
+// HTTP handler - receives POST /v1/chat/completions
 iii.registerFunction(
   "http::run_inference_over_http",
   async (req: Record<string, unknown>) => {

@@ -1,4 +1,4 @@
-// k6 load test — run with: k6 run scripts/load-test.js --env API_URL=http://<ip>:3111
+// k6 load test - run with: k6 run scripts/load-test.js --env API_URL=http://<ip>:3111
 import http from "k6/http";
 import { check, sleep } from "k6";
 import { Trend, Rate } from "k6/metrics";

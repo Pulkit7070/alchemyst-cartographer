@@ -26,7 +26,7 @@ output "ssh_gateway" {
 }
 
 output "ssh_inference" {
-  description = "SSH to inference VM via IAP (private — no public IP)"
+  description = "SSH to inference VM via IAP (private - no public IP)"
   value       = "gcloud compute ssh inference-vm --tunnel-through-iap --zone=${var.zone} --project=${var.project_id}"
 }
 

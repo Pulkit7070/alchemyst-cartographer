@@ -22,5 +22,5 @@ sequenceDiagram
     CW->>CW: wrap in OpenAI-compatible JSON
     CW-->>C: 200 { id, choices[{ message }] }
 
-    Note over C,M: Total latency: ~500ms–3s on CPU (gemma-3-270m)
+    Note over C,M: Total latency: ~500ms-3s on CPU (gemma-3-270m)
     Note over IW,M: Model loads once on boot,<br/>stays resident in RAM

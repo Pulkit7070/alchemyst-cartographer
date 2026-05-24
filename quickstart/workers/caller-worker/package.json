@@ -2,7 +2,7 @@
   "name": "caller-worker",
   "version": "0.1.0",
   "type": "module",
-  "description": "HTTP gateway — forwards /v1/chat/completions to inference worker via iii RPC",
+  "description": "HTTP gateway - forwards /v1/chat/completions to inference worker via iii RPC",
   "scripts": {
     "dev": "tsx watch src/worker.ts",
     "build": "tsc"

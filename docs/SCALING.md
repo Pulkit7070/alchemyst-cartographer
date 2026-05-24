@@ -12,8 +12,8 @@ the current single-VM deployment to production-grade distributed inference.
 | Axis | Today | 100x |
 |------|-------|------|
 | Model size | 270M params, Q8 GGUF, 241 MB | ~27B params (Gemma 27B / Llama 3 70B Q4) |
-| Throughput | ~2–5 req/s sustained, CPU | 200–500 req/s sustained |
-| Latency | 500ms–3s p50 (CPU) | <200ms TTFT on GPU |
+| Throughput | ~2-5 req/s sustained, CPU | 200-500 req/s sustained |
+| Latency | 500ms-3s p50 (CPU) | <200ms TTFT on GPU |
 
 Each axis requires a different set of changes. Below we walk through all three.
 
@@ -37,7 +37,7 @@ A 27B parameter model in Q4 quantization needs ~14 GB of VRAM - beyond any CPU.
 1. Replace `e2-standard-4` with `a2-highgpu-1g` (A100 40 GB) or `g2-standard-4` (L4 24 GB).
 2. Switch runtime from `transformers` to **vLLM** or **TensorRT-LLM**:
    - **vLLM**: drop-in, OpenAI-compatible API, PagedAttention eliminates KV cache fragmentation, continuous batching out of the box. Best for getting started on GPU quickly.
-   - **TensorRT-LLM**: NVIDIA-compiled kernels for the specific GPU. 20–40% higher throughput vs vLLM after compilation. Worth it when the model is fixed and throughput matters.
+   - **TensorRT-LLM**: NVIDIA-compiled kernels for the specific GPU. 20-40% higher throughput vs vLLM after compilation. Worth it when the model is fixed and throughput matters.
 3. The iii `inference-worker` becomes a thin wrapper that calls vLLM's local HTTP server instead of running transformers inline.
 
 ### Quantization tradeoffs
@@ -46,7 +46,7 @@ A 27B parameter model in Q4 quantization needs ~14 GB of VRAM - beyond any CPU.
 | FP16 | baseline | none | evaluation, fine-tuning |
 | BF16 | same as FP16 | none on modern GPUs | A100/H100 training |
 | Q8 | 50% | <1% | safe default for most deployments |
-| Q4_K_M | 75% | ~2–3% | when VRAM is the bottleneck |
+| Q4_K_M | 75% | ~2-3% | when VRAM is the bottleneck |
 | Q2 | 85% | significant | edge/IoT only |
 
 ---
@@ -57,7 +57,7 @@ A 27B parameter model in Q4 quantization needs ~14 GB of VRAM - beyond any CPU.
 The current `transformers.pipeline()` processes one request at a time.
 vLLM's **PagedAttention + continuous batching** dynamically groups requests
 mid-generation, keeping the GPU ~80% utilized vs ~5% with naive batching.
-This alone delivers 10–30× throughput improvement.
+This alone delivers 10-30× throughput improvement.
 
 ### Horizontal scaling via Managed Instance Groups
 ```
@@ -103,7 +103,7 @@ Terraform modules stay unchanged. This is the value of the worker-per-concern de
 ### Techniques
 | Technique | Win | Complexity |
 |-----------|-----|-----------|
-| Continuous batching (vLLM default) | 10–30× throughput | Low - automatic |
+| Continuous batching (vLLM default) | 10-30× throughput | Low - automatic |
 | Speculative decoding | ~2× TTFT reduction | Medium - need a draft model |
 | KV cache offload (CPU/disk) | Enables longer context | Medium |
 | Flash Attention 2 | ~2× attention speed | Low - pip install |
@@ -112,7 +112,7 @@ Terraform modules stay unchanged. This is the value of the worker-per-concern de
 ### Speculative decoding in practice
 Use a small draft model (e.g. Gemma 3 1B) to predict the next N tokens,
 then verify in parallel with the large model. For typical chat prompts,
-~60–70% of speculated tokens are accepted, cutting TTFT roughly in half
+~60-70% of speculated tokens are accepted, cutting TTFT roughly in half
 with no quality loss.
 
 ---
@@ -127,7 +127,7 @@ Stage 0 (this assignment)
 Stage 1 (next 3 months)
   Swap inference VM to L4 GPU
   Install vLLM, serve 12B model
-  20–50 req/s, <500ms TTFT
+  20-50 req/s, <500ms TTFT
 
 Stage 2 (production)
   Managed Instance Group for inference

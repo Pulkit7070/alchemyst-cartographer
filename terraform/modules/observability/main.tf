@@ -110,7 +110,7 @@ resource "google_monitoring_alert_policy" "inference_cpu" {
   severity              = "WARNING"
 }
 
-#  Dashboard (JSON as heredoc — terraform fmt does not touch heredoc contents)
+# Dashboard (JSON as heredoc - terraform fmt does not touch heredoc contents)
 resource "google_monitoring_dashboard" "main" {
   project        = var.project_id
   dashboard_json = <<-EOT

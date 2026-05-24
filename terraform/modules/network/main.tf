@@ -21,7 +21,7 @@ resource "google_compute_subnetwork" "public" {
   }
 }
 
-# Private subnet (inference VM lives here — no public IP)
+# Private subnet (inference VM lives here - no public IP)
 resource "google_compute_subnetwork" "private" {
   project                  = var.project_id
   name                     = "private-subnet"
@@ -66,7 +66,7 @@ resource "google_compute_router_nat" "nat" {
 
 # Firewall rules (deny-by-default; only what's explicitly needed)
 
-# SSH via IAP — gateway and inference VMs
+# SSH via IAP - gateway and inference VMs
 resource "google_compute_firewall" "allow_iap_ssh" {
   project  = var.project_id
   name     = "allow-iap-ssh"
@@ -78,12 +78,12 @@ resource "google_compute_firewall" "allow_iap_ssh" {
     ports    = ["22"]
   }
 
-  # Google IAP CIDR only — not the open internet
+  # Google IAP CIDR only - not the open internet
   source_ranges = ["35.235.240.0/20"]
   target_tags   = ["iap-ssh"]
 }
 
-# iii engine WebSocket — inference VM → gateway VM (internal only)
+# iii engine WebSocket - inference VM to gateway VM (internal only)
 resource "google_compute_firewall" "allow_engine_internal" {
   project  = var.project_id
   name     = "allow-iii-engine-internal"

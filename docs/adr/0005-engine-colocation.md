@@ -13,7 +13,7 @@ Option B: engine + caller-worker run on the gateway VM together.
 
 ## Consequences
 **Positive:**
-- Saves one VM ($13–$50/mo)
+- Saves one VM ($13-$50/mo)
 - Eliminates one network hop (caller → engine is loopback `127.0.0.1:49134` instead of a VPC hop)
 - The engine WebSocket port (49134) is only reachable from the private subnet - firewall scoped to `10.10.2.0/24`
 - Inference worker connects outbound to `<gateway-internal-ip>:49134` - a single stable internal IP

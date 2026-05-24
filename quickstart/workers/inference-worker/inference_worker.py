@@ -73,4 +73,4 @@ def run_inference_handler(payload: Dict[str, Any]) -> str:
 
 
 iii.register_function("inference::run_inference", run_inference_handler)
-print("Inference worker started — listening for calls to inference::run_inference")
+print("Inference worker started - listening for calls to inference::run_inference")

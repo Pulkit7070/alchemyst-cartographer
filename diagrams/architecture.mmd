@@ -2,7 +2,7 @@ graph TB
     Internet([Internet]) --> CA[Cloud Armor\nWAF + Rate Limit]
     CA --> GW
 
-    subgraph PUBLIC ["PUBLIC SUBNET — 10.10.1.0/24"]
+    subgraph PUBLIC ["PUBLIC SUBNET - 10.10.1.0/24"]
         GW["gateway-vm\ne2-small\nShielded VM\nStatic IP: 10.10.1.10"]
         ENGINE["iii-engine\n:49134 WebSocket"]
         CALLER["caller-worker\nTypeScript\n:3111 HTTP"]
@@ -10,7 +10,7 @@ graph TB
         GW --- CALLER
     end
 
-    subgraph PRIVATE ["PRIVATE SUBNET — 10.10.2.0/24  (no public IP)"]
+    subgraph PRIVATE ["PRIVATE SUBNET - 10.10.2.0/24 (no public IP)"]
         INF["inference-vm\ne2-standard-4\nShielded VM"]
         WORKER["inference-worker\nPython\ngemma-3-270m Q8"]
         INF --- WORKER
